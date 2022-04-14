@@ -1,15 +1,23 @@
 package com.leandro.fernandez.testapi.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.leandro.fernandez.testapi.repository.QuestionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/questions")
 public class QuestionController {
 
+    @Autowired
+    private QuestionRepository questionRepository;
+
     @GetMapping
-    public String getQuestions() { // -> GET /questions
-        return "Como se llama pepe?";
+    public Iterable<Question> getQuestions() { // -> GET /questions
+        return questionRepository.findAll();
+    }
+
+    @PostMapping
+    public Question createQuestion(@RequestBody Question question) {
+        return questionRepository.save(question);
     }
 }
