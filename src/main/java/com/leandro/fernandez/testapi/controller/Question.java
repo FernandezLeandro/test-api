@@ -1,22 +1,22 @@
 package com.leandro.fernandez.testapi.controller;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Question { //JSON (javascript object notation)
     @Id
-    public String question;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    public Long id;
+    public String text;
     @ElementCollection
-    public List<String> posQuestions;
-    public Integer rta;
+    public List<String> answers;
+    public Integer rightAnswerIndex;
 
     public Question() {
-        this.question = "";
-        this.posQuestions = new ArrayList<>();
-        this.rta = 0;
+        this.text = "";
+        this.answers = new ArrayList<>();
+        this.rightAnswerIndex = 0;
     }
 }
