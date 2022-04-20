@@ -12,11 +12,11 @@ public class Question { //JSON (javascript object notation)
     public String text;
     @ElementCollection
     public List<String> answers;
-    public Integer rightAnswerIndex;
+    public Integer correctAnswerIndex;
 
     public Question() {
         this.text = "";
         this.answers = new ArrayList<>();
-        this.rightAnswerIndex = 0;
+        this.correctAnswerIndex = 0;
     }
 }
