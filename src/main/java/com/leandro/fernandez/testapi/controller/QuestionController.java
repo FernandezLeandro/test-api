@@ -47,9 +47,9 @@ public class QuestionController {
         Question deletedQuestion = searchQuestion(id, storedQuestions);
         if (deletedQuestion != null) {
             questionRepository.delete(deletedQuestion);
-            return new ResponseEntity<>(HttpStatus.OK);
-        } else
             return new ResponseEntity<>(id, HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PostMapping
