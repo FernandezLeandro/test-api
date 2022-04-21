@@ -3,7 +3,6 @@ package com.leandro.fernandez.testapi.controller;
 import com.leandro.fernandez.testapi.repository.QuestionRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -33,23 +32,24 @@ public class QuestionController {
     @GetMapping ("/{id}")
     public ResponseEntity <Question> getQuestionByID (@PathVariable Long id) {
         ArrayList <Question> storedQuestions = findAllQuestions();
-        Question requestedQuestion = new Question ();
-        for (Question q : storedQuestions) {
-            if (q.id.compareTo(id) == 0)
-                return ResponseEntity.ok (q);
-        }
-        return ResponseEntity.noContent().build();
+        ResponseEntity<Question> foundQuestion = searchQuestionResponseEntity(id, storedQuestions);
+        if (foundQuestion != null){
+            return foundQuestion;
+        } else
+            return ResponseEntity.noContent().build();
     }
+
+
+
     @DeleteMapping ("/{id}")
     public ResponseEntity <Long> deleteQuestionByID (@PathVariable Long id) {
         ArrayList <Question> storedQuestions = findAllQuestions();
-        for (Question q : storedQuestions) {
-            if (q.id.compareTo(id) == 0){
-                questionRepository.delete(q);
-                return new ResponseEntity<>(HttpStatus.OK);
-            }
-        }
-        return new ResponseEntity<>(id, HttpStatus.OK);
+        Question deletedQuestion = searchQuestion(id, storedQuestions);
+        if (deletedQuestion != null) {
+            questionRepository.delete(deletedQuestion);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else
+            return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @PostMapping
@@ -123,5 +123,21 @@ public class QuestionController {
         ArrayList<Question> storedQuestions = new ArrayList<>();
         questionRepository.findAll().forEach(storedQuestions::add);
         return storedQuestions;
+    }
+
+    private ResponseEntity<Question> searchQuestionResponseEntity(Long id, ArrayList<Question> storedQuestions) {
+        for (Question q : storedQuestions) {
+            if (q.id.compareTo(id) == 0)
+                return ResponseEntity.ok(q);
+        }
+        return null;
+    }
+
+    private Question searchQuestion(Long id, ArrayList<Question> storedQuestions) {
+        for (Question q : storedQuestions) {
+            if (q.id.compareTo(id) == 0)
+                return q;
+        }
+        return null;
     }
 }
