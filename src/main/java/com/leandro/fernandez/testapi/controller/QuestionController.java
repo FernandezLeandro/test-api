@@ -3,6 +3,7 @@ package com.leandro.fernandez.testapi.controller;
 import com.leandro.fernandez.testapi.repository.QuestionRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,28 @@ public class QuestionController {
         } else {
             return ResponseEntity.ok(questions);
         }
+    }
+
+    @GetMapping ("/{id}")
+    public ResponseEntity <Question> getQuestionByID (@PathVariable Long id) {
+        ArrayList <Question> storedQuestions = findAllQuestions();
+        Question requestedQuestion = new Question ();
+        for (Question q : storedQuestions) {
+            if (q.id.compareTo(id) == 0)
+                return ResponseEntity.ok (q);
+        }
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping ("/{id}")
+    public ResponseEntity <Long> deleteQuestionByID (@PathVariable Long id) {
+        ArrayList <Question> storedQuestions = findAllQuestions();
+        for (Question q : storedQuestions) {
+            if (q.id.compareTo(id) == 0){
+                questionRepository.delete(q);
+                return new ResponseEntity<>(HttpStatus.OK);
+            }
+        }
+        return new ResponseEntity<>(id, HttpStatus.OK);
     }
 
     @PostMapping
