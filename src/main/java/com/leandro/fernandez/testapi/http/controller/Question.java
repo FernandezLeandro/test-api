@@ -1,4 +1,4 @@
-package com.leandro.fernandez.testapi.controller;
+package com.leandro.fernandez.testapi.http.controller;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -14,7 +14,8 @@ public class Question { //JSON (javascript object notation)
     public List<String> answers;
     public Integer correctAnswerIndex;
 
-    public Question() {
+    public Question(Long id) {
+        this.id = id;
         this.text = "";
         this.answers = new ArrayList<>();
         this.correctAnswerIndex = 0;

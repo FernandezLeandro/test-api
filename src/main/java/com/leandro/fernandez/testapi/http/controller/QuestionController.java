@@ -1,6 +1,6 @@
-package com.leandro.fernandez.testapi.controller;
+package com.leandro.fernandez.testapi.http.controller;
 
-import com.leandro.fernandez.testapi.repository.QuestionRepository;
+import com.leandro.fernandez.testapi.domain.repository.QuestionRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/questions")
@@ -29,27 +30,22 @@ public class QuestionController {
         }
     }
 
-    @GetMapping ("/{id}")
-    public ResponseEntity <Question> getQuestionByID (@PathVariable Long id) {
-        ArrayList <Question> storedQuestions = findAllQuestions();
-        ResponseEntity<Question> foundQuestion = searchQuestionResponseEntity(id, storedQuestions);
-        if (foundQuestion != null){
-            return foundQuestion;
-        } else
-            return ResponseEntity.noContent().build();
+    @GetMapping("/{id}")
+    public ResponseEntity<Question> getQuestionById(@PathVariable Long id) {
+        return questionRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-
-    @DeleteMapping ("/{id}")
-    public ResponseEntity <Long> deleteQuestionByID (@PathVariable Long id) {
-        ArrayList <Question> storedQuestions = findAllQuestions();
-        Question deletedQuestion = searchQuestion(id, storedQuestions);
-        if (deletedQuestion != null) {
-            questionRepository.delete(deletedQuestion);
-            return new ResponseEntity<>(id, HttpStatus.OK);
-        } else
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Question> deleteQuestionByID(@PathVariable Long id) {
+        Optional<Question> question = questionRepository.findById(id);
+        if (question.isPresent()) {
+            questionRepository.delete(question.get());
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
@@ -123,21 +119,5 @@ public class QuestionController {
         ArrayList<Question> storedQuestions = new ArrayList<>();
         questionRepository.findAll().forEach(storedQuestions::add);
         return storedQuestions;
-    }
-
-    private ResponseEntity<Question> searchQuestionResponseEntity(Long id, ArrayList<Question> storedQuestions) {
-        for (Question q : storedQuestions) {
-            if (q.id.compareTo(id) == 0)
-                return ResponseEntity.ok(q);
-        }
-        return null;
-    }
-
-    private Question searchQuestion(Long id, ArrayList<Question> storedQuestions) {
-        for (Question q : storedQuestions) {
-            if (q.id.compareTo(id) == 0)
-                return q;
-        }
-        return null;
     }
 }
